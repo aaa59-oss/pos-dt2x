@@ -315,17 +315,17 @@ function generateEZPL({ orderType, itemName, options, price, orderNo, current, t
   // 因為黑底，用反白字比較難，改用粗體黑字在旁邊
   // 改成：左側放數字 + 類型
   const typeText = `1 ${orderType}`;
-  commands.push(`AB,90,20,1,1,0,0,${typeText}`);
+  commands.push(`AZ,90,20,1,1,0,0E,${typeText}`);
 
-  // === 品名 ===
-  commands.push(`AC,90,55,${fontMul},${fontMul},0,0,${itemName}`);
+  // === 品名（中文，需要 Z 字型） ===
+  commands.push(`AZ,90,55,${fontMul},${fontMul},0,0E,${itemName}`);
 
-  // === 客製選項 ===
-  commands.push(`AA,90,100,1,1,0,0,${optStr}`);
+  // === 客製選項（中文，需要 Z 字型） ===
+  commands.push(`AZ,90,100,1,1,0,0E,${optStr}`);
 
-  // === 日期時間 + 店名 ===
+  // === 日期時間（純數字/符號，用原本西方字型即可） + 店名（中文，用 Z 字型） ===
   commands.push(`AA,90,140,1,1,0,0,${dateStr} ${timeStr}`);
-  commands.push(`AA,90,160,1,1,0,0,${storeName}${storeName}`);
+  commands.push(`AZ,90,160,1,1,0,0E,${storeName}${storeName}`);
 
   // === 價格 ===
   commands.push(`AD,250,160,1,1,0,0,$${price}`);
