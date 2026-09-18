@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1565c0">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>簡易點餐 POS - DT2x</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- 頂部狀態列 -->
+    <header class="header">
+      <div class="store-name">樹林站前店</div>
+      <div class="status">
+        <span id="printer-status" class="status-dot offline"></span>
+        <span id="printer-ip-display">印表機未設定</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- 左側：選單 -->
+      <section class="menu-section">
+        <div class="category-tabs" id="category-tabs"></div>
+        <div class="menu-grid" id="menu-grid"></div>
+      </section>
+
+      <!-- 右側：購物車 + 設定 -->
+      <section class="cart-section">
+        <div class="order-type">
+          <button class="type-btn active" data-type="外帶" id="btn-takeout">外帶</button>
+          <button class="type-btn" data-type="內用" id="btn-dinein">內用</button>
+        </div>
+
+        <div class="cart-header">
+          <span>目前訂單</span>
+          <button class="btn-clear" id="btn-clear">清空</button>
+        </div>
+
+        <div class="cart-list" id="cart-list">
+          <div class="empty-cart">尚未點餐</div>
+        </div>
+
+        <div class="options-panel" id="options-panel" style="display:none;">
+          <h4>客製選項</h4>
+          <div class="option-group">
+            <label>甜度</label>
+            <div class="option-btns" id="sugar-options"></div>
+          </div>
+          <div class="option-group">
+            <label>冰量</label>
+            <div class="option-btns" id="ice-options"></div>
+          </div>
+          <div class="option-group">
+            <label>其他</label>
+            <div class="option-btns" id="extra-options"></div>
+          </div>
+          <button class="btn-add" id="btn-confirm-options">加入購物車</button>
+        </div>
+
+        <div class="cart-footer">
+          <div class="total">
+            <span>合計</span>
+            <span id="total-price">$0</span>
+          </div>
+          <button class="btn-checkout" id="btn-checkout" disabled>結帳並列印標籤</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- 設定 Modal -->
+    <div class="modal" id="settings-modal">
+      <div class="modal-content">
+        <h3>印表機設定</h3>
+        <label>DT2x IP 位址</label>
+        <input type="text" id="input-printer-ip" placeholder="例如 192.168.1.100" value="192.168.1.100">
+        <label>連接埠 (通常 9100)</label>
+        <input type="number" id="input-printer-port" value="9100">
+        <label>標籤字體大小</label>
+        <select id="font-size">
+          <option value="small">小字</option>
+          <option value="medium" selected>中字</option>
+          <option value="large">大字</option>
+        </select>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="btn-test-print">測試列印</button>
+          <button class="btn-primary" id="btn-save-settings">儲存</button>
+          <button class="btn-secondary" id="btn-close-settings">關閉</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 結帳確認 Modal -->
+    <div class="modal" id="checkout-modal">
+      <div class="modal-content">
+        <h3>確認訂單</h3>
+        <div id="checkout-summary"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="btn-confirm-print">確認列印</button>
+          <button class="btn-secondary" id="btn-cancel-checkout">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 浮動設定按鈕 -->
+    <button class="fab-settings" id="btn-settings">⚙</button>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // 註冊 Service Worker，讓它變成可安裝的 App
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('PWA Service Worker 已註冊', reg.scope))
+        .catch(err => console.log('SW 註冊失敗', err));
+    }
+  </script>
+</body>
+</html>
