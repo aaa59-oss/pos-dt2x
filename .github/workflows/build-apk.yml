@@ -1,0 +1,68 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install -g @capacitor/cli
+
+      - name: Add Android platform
+        run: |
+          npx cap add android || true
+          npx cap sync android
+
+      - name: Install native TCP printer plugin
+        run: |
+          mkdir -p android/app/src/main/java/com/pos/dt2x/plugins
+          cp android-plugin/TcpPrinterPlugin.java android/app/src/main/java/com/pos/dt2x/plugins/TcpPrinterPlugin.java
+          cat > android/app/src/main/java/com/pos/dt2x/MainActivity.java << 'EOF'
+package com.pos.dt2x;
+
+import android.os.Bundle;
+import com.getcapacitor.BridgeActivity;
+import com.pos.dt2x.plugins.TcpPrinterPlugin;
+
+public class MainActivity extends BridgeActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        registerPlugin(TcpPrinterPlugin.class);
+        super.onCreate(savedInstanceState);
+    }
+}
+EOF
+
+      - name: Build Debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: pos-dt2x-debug
+          path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 30
